@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSHS Reifegradverfahren — Kostenaufstellung</title>
+<style>
+  :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; --yellow: #d29922; --red: #f85149; --orange: #db6d28; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 24px; max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+  .summary-cards { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .summary-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 160px; flex: 1; }
+  .summary-card.highlight { background: #2a1f2e; border-color: #6b3a7a; }
+  .summary-card .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .summary-card .value { font-size: 22px; font-weight: 600; margin-top: 4px; }
+  .summary-card .value.total { color: var(--accent); }
+  .summary-card .sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .section { margin-bottom: 32px; }
+  .section h2 { font-size: 16px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  th { background: #1c2128; text-align: left; padding: 10px 14px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); border-bottom: 1px solid var(--border); }
+  th.num, td.num { text-align: right; }
+  td { padding: 10px 14px; font-size: 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr.subtotal td { font-weight: 600; background: #1c2128; }
+  tr.grandtotal td { font-weight: 700; background: #2a1f2e; font-size: 15px; }
+  tr.refund td { color: var(--accent); }
+  .badge-ref { background: rgba(88,166,255,0.12); color: var(--accent); font-size: 10px; padding: 1px 6px; margin-left: 4px; display: inline-block; border-radius: 10px; }
+  .badge-blue { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; background: rgba(88,166,255,0.15); color: var(--accent); }
+  .badge-green { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; background: rgba(63,185,80,0.15); color: var(--green); }
+  .assumptions { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin-bottom: 24px; }
+  .assumptions h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .assumptions table { background: transparent; border: none; }
+  .assumptions td { border-bottom: 1px solid var(--border); padding: 6px 14px; font-size: 13px; }
+  .assumptions tr:last-child td { border-bottom: none; }
+  .refund-note { background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.25); border-radius: 8px; padding: 16px 18px; margin-bottom: 24px; font-size: 13px; line-height: 1.6; }
+  .refund-note strong { color: var(--accent); }
+  .scenario { border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+  .scenario-full { background: var(--card); border: 1px solid var(--border); }
+  .scenario-30 { background: rgba(63,185,80,0.04); border: 1px solid rgba(63,185,80,0.25); }
+  .scenario h3 { font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+  .scenario h3.green { color: var(--green); }
+  .kpi-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+  .kpi { flex: 1; min-width: 130px; }
+  .kpi .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .kpi .kpi-value { font-size: 20px; font-weight: 600; margin-top: 2px; }
+  .kpi .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .insight { background: rgba(210,153,34,0.06); border: 1px solid rgba(210,153,34,0.25); border-radius: 8px; padding: 16px 18px; margin-bottom: 24px; font-size: 13px; line-height: 1.6; }
+  .insight strong { color: var(--yellow); }
+  footer { color: var(--muted); font-size: 11px; margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--border); line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<h1>MS/HS Reifegradverfahren — Executive Summary</h1>
+<div class="subtitle">Terra One Climate Solutions GmbH · Stand: Oktober 2026 · 105 Standorte · 2.840 MW (60 neue UWs + 7 bestehende + 38 begrenzt verfügbar mit Deal)</div>
+
+<div class="summary-cards">
+  <div class="summary-card highlight">
+    <div class="label">100% Szenario</div>
+    <div class="value total">5.173.528 €</div>
+    <div class="sub">105 Standorte · 2.840 MW</div>
+  </div>
+  <div class="summary-card highlight">
+    <div class="label">30% Szenario</div>
+    <div class="value" style="color:var(--green)">1.831.432 €</div>
+    <div class="sub">davon 420.000 € Block 2+3</div>
+  </div>
+  <div class="summary-card highlight">
+    <div class="label">Nicht refundable</div>
+    <div class="value" style="color:var(--red)">913.528 €</div>
+    <div class="sub">Block 1+4 (VM+BA+Verm+FL)</div>
+  </div>
+  <div class="summary-card highlight">
+    <div class="label">€ / MW nicht refundable</div>
+    <div class="value" style="color:var(--red)">357</div>
+    <div class="sub">Block 1+4: 913.528 / 2.560 MW</div>
+  </div>
+</div>
+
+<div class="insight">
+  <strong>Key Insight:</strong> Die RGV-Gebühr (~80% der Kosten) wird bei Nicht-Zuschlag vollständig zurückerstattet und bei Zuschlag mit den Netzanschlusskosten verrechnet — in keinem Szenario ein Verlust.* Block 4 (38 UWs mit bestehendem Deal) verursacht <strong>keine Freelancer-Kosten</strong>, da die Akquise intern über eigenen Staff erfolgt. Vollmachten, Bauanträge, Vermessung und Freelancer-Stunden fallen nur für realisierte Projekte an.
+</div>
+
+<!-- ============================================================ -->
+<!-- PROJEKTÜBERSICHT                                              -->
+<!-- ============================================================ -->
+
+<div class="section">
+  <h2>Projektübersicht nach Netzbetreiber</h2>
+
+  <p style="font-size:13px;color:var(--muted);margin-bottom:14px"><strong style="color:var(--text)">1. Netzanschlusskapazität „verfügbar" + „teilweise verfügbar"</strong> — 60 UWs für Reifegradverfahren</p>
+  <table style="margin-bottom:20px">
+    <tr>
+      <th>Netzbetreiber</th>
+      <th class="num">Verfügbar</th>
+      <th class="num">Teilweise verfügbar</th>
+      <th class="num">Gesamt</th>
+    </tr>
+    <tr>
+      <td>SH Netz</td>
+      <td class="num">8</td>
+      <td class="num">9</td>
+      <td class="num"><strong>17</strong></td>
+    </tr>
+    <tr>
+      <td>E.DIS</td>
+      <td class="num">1</td>
+      <td class="num">7</td>
+      <td class="num"><strong>8</strong></td>
+    </tr>
+    <tr>
+      <td>Bayernwerk</td>
+      <td class="num">1</td>
+      <td class="num">34</td>
+      <td class="num"><strong>35</strong></td>
+    </tr>
+    <tr class="grandtotal">
+      <td>Gesamt</td>
+      <td class="num">10</td>
+      <td class="num">50</td>
+      <td class="num"><strong>60</strong></td>
+    </tr>
+  </table>
+
+  <p style="font-size:13px;color:var(--muted);margin-bottom:14px"><strong style="color:var(--text)">2. „Begrenzt verfügbar", aber Baugenehmigung vorhanden</strong> — 3 Projekte, 130 MW <span class="badge-ref">nur RGV-Kaution</span></p>
+  <table style="margin-bottom:20px">
+    <tr>
+      <th>Netzbetreiber</th>
+      <th>Projekte</th>
+      <th class="num">MW</th>
+      <th class="num">Segment</th>
+    </tr>
+    <tr>
+      <td>SH Netz</td>
+      <td>Weesby</td>
+      <td class="num">100</td>
+      <td class="num">HS</td>
+    </tr>
+    <tr>
+      <td>E.DIS</td>
+      <td>Angermünde</td>
+      <td class="num">15</td>
+      <td class="num">MS</td>
+    </tr>
+    <tr>
+      <td>E.DIS</td>
+      <td>Beeskow/Neuendorf</td>
+      <td class="num">15</td>
+      <td class="num">MS</td>
+    </tr>
+    <tr class="subtotal">
+      <td>Gesamt</td>
+      <td><strong>3 Projekte</strong></td>
+      <td class="num"><strong>130</strong></td>
+      <td class="num"></td>
+    </tr>
+  </table>
+
+  <p style="font-size:13px;color:var(--muted);margin-bottom:14px"><strong style="color:var(--text)">3. „Begrenzt verfügbar", aber Bauantrag gestellt / in Erstellung</strong> — 4 Projekte, 150 MW <span class="badge-ref">nur RGV-Kaution</span></p>
+  <table>
+    <tr>
+      <th>Netzbetreiber</th>
+      <th>Projekte</th>
+      <th class="num">MW</th>
+      <th class="num">Segment</th>
+    </tr>
+    <tr>
+      <td>SH Netz</td>
+      <td>Heede (eingereicht)</td>
+      <td class="num">15</td>
+      <td class="num">MS</td>
+    </tr>
+    <tr>
+      <td>SH Netz</td>
+      <td>Marne-West (in Erstellung)</td>
+      <td class="num">20</td>
+      <td class="num">MS</td>
+    </tr>
+    <tr>
+      <td>E.DIS</td>
+      <td>Granzow</td>
+      <td class="num">15</td>
+      <td class="num">MS</td>
+    </tr>
+    <tr>
+      <td>E.DIS</td>
+      <td>Schenkenberg/Baumgarten</td>
+      <td class="num">100</td>
+      <td class="num">HS</td>
+    </tr>
+    <tr>
+      <td style="color:var(--muted)">Bayernwerk</td>
+      <td style="color:var(--muted)">— <span style="font-size:12px">(nur Solarpark Trennfeld, Grünspeicher)</span></td>
+      <td class="num" style="color:var(--muted)">—</td>
+      <td class="num"></td>
+    </tr>
+    <tr class="subtotal">
+      <td>Gesamt</td>
+      <td><strong>4 Projekte</strong></td>
+      <td class="num"><strong>150</strong></td>
+      <td class="num"></td>
+    </tr>
+  </table>
+
+  <p style="font-size:13px;color:var(--muted);margin-top:20px;margin-bottom:14px"><strong style="color:var(--text)">4. „Begrenzt verfügbar", aber Deal am Standort und gute Fläche</strong> — 38 UWs <span class="badge-green">kein Freelancer</span></p>
+  <table style="margin-bottom:20px">
+    <tr>
+      <th>Netzbetreiber</th>
+      <th class="num">Anzahl UWs</th>
+    </tr>
+    <tr>
+      <td>SH Netz</td>
+      <td class="num"><strong>22</strong></td>
+    </tr>
+    <tr>
+      <td>E.DIS</td>
+      <td class="num"><strong>11</strong></td>
+    </tr>
+    <tr>
+      <td>Bayernwerk</td>
+      <td class="num"><strong>5</strong></td>
+    </tr>
+    <tr class="subtotal">
+      <td>Gesamt</td>
+      <td class="num"><strong>38</strong></td>
+    </tr>
+  </table>
+
+  <div style="margin-top:16px;padding:12px 16px;background:rgba(88,166,255,0.06);border:1px solid rgba(88,166,255,0.2);border-radius:6px;font-size:13px">
+    <strong style="color:var(--accent)">Block 2+3:</strong> BA, Vermessung und Freelancer-Kosten bereits bezahlt → nur RGV-Kaution (280 MW × 1.500 €/MW = <strong>420.000 €</strong>, refundable)
+  </div>
+  <div style="margin-top:8px;padding:12px 16px;background:rgba(63,185,80,0.06);border:1px solid rgba(63,185,80,0.2);border-radius:6px;font-size:13px">
+    <strong style="color:var(--green)">Block 4:</strong> Akquise intern über eigenen Staff (bestehender Kontakt zum Eigentümer) → <strong>keine Freelancer-Kosten</strong> (keine Vollmacht, keine FL-Stunden). Nur RGV + BA + Vermessung.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCENARIO 1: 100%                                               -->
+<!-- ============================================================ -->
+
+<div class="scenario scenario-full">
+  <h3>Szenario 100%: Alle 105 Standorte realisiert (2.840 MW)</h3>
+  <table>
+    <tr>
+      <th>Kostenposition</th>
+      <th class="num">Stückpreis</th>
+      <th class="num">Menge</th>
+      <th class="num">Summe</th>
+    </tr>
+    <tr class="refund">
+      <td>RGV-Kaution Block 1 <span class="badge-ref">refundable / verrechnet*</span></td>
+      <td class="num">1.500 €/MW</td>
+      <td class="num">1.800 MW</td>
+      <td class="num">2.700.000 €</td>
+    </tr>
+    <tr class="refund">
+      <td>RGV-Kaution Block 2+3 <span class="badge-ref">refundable / verrechnet*</span></td>
+      <td class="num">1.500 €/MW</td>
+      <td class="num">280 MW</td>
+      <td class="num">420.000 €</td>
+    </tr>
+    <tr class="refund">
+      <td>RGV-Kaution Block 4 <span class="badge-ref">refundable / verrechnet*</span></td>
+      <td class="num">1.500 €/MW</td>
+      <td class="num">760 MW</td>
+      <td class="num">1.140.000 €</td>
+    </tr>
+    <tr>
+      <td>Freelancer Vollmachten <span style="color:var(--muted);font-size:11px">(nur Block 1)</span></td>
+      <td class="num">Ø 3.167 €/Projekt</td>
+      <td class="num">60 Projekte</td>
+      <td class="num">190.000 €</td>
+    </tr>
+    <tr>
+      <td>Bauantrag Erstellung (RHO) <span style="color:var(--muted);font-size:11px">(Block 1 + 4)</span></td>
+      <td class="num">5.100 €/Projekt</td>
+      <td class="num">98 Projekte</td>
+      <td class="num">499.800 €</td>
+    </tr>
+    <tr>
+      <td>Vermessung <span style="color:var(--muted);font-size:11px">(Block 1 + 4)</span></td>
+      <td class="num">MS 1.466 / HS 4.104 €</td>
+      <td class="num">Block 1: 40+20 · Block 4: 38 MS</td>
+      <td class="num">196.428 €</td>
+    </tr>
+    <tr>
+      <td>Freelancer Projektarbeit <span style="color:var(--muted);font-size:11px">(nur Block 1)</span></td>
+      <td class="num">455 €/Projekt</td>
+      <td class="num">60 Projekte</td>
+      <td class="num">27.300 €</td>
+    </tr>
+    <tr class="grandtotal">
+      <td>Gesamtkosten</td>
+      <td class="num"></td>
+      <td class="num"></td>
+      <td class="num">5.173.528 €</td>
+    </tr>
+    <tr class="subtotal">
+      <td style="color:var(--red)">davon nicht refundable (VM + BA + Verm + FL)</td>
+      <td class="num"></td>
+      <td class="num"></td>
+      <td class="num" style="color:var(--red)">913.528 €</td>
+    </tr>
+  </table>
+  <div class="kpi-row" style="margin-top:16px">
+    <div class="kpi"><div class="kpi-label">Standorte (100%)</div><div class="kpi-value" style="color:var(--accent)">105</div><div class="kpi-sub">60 B1 + 7 B2+3 + 38 B4</div></div>
+    <div class="kpi"><div class="kpi-label">MW (100%)</div><div class="kpi-value" style="color:var(--accent)">2.840</div><div class="kpi-sub">1.800 + 280 + 760</div></div>
+    <div class="kpi"><div class="kpi-label">Refundable (RGV)</div><div class="kpi-value" style="color:var(--accent)">4.260.000</div><div class="kpi-sub">82% der Gesamtkosten</div></div>
+    <div class="kpi"><div class="kpi-label">Nicht refundable</div><div class="kpi-value" style="color:var(--red)">913.528</div><div class="kpi-sub">357 €/MW (B1+4: 2.560 MW)</div></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCENARIO 2: 30% ohne Block 4                                   -->
+<!-- ============================================================ -->
+
+<div class="scenario scenario-30">
+  <h3 class="green">Szenario 30% (ohne Block 4): 18 B1 + 7 B2+3 realisiert (820 MW)</h3>
+  <table>
+    <tr>
+      <th>Kostenposition</th>
+      <th class="num">Stückpreis</th>
+      <th class="num">Menge</th>
+      <th class="num">Summe</th>
+    </tr>
+    <tr class="refund">
+      <td>RGV-Kaution Block 1 <span class="badge-ref">refundable / verrechnet*</span></td>
+      <td class="num">1.500 €/MW</td>
+      <td class="num">540 MW</td>
+      <td class="num">810.000 €</td>
+    </tr>
+    <tr class="refund">
+      <td>RGV-Kaution Block 2+3 <span class="badge-ref">refundable / verrechnet*</span></td>
+      <td class="num">1.500 €/MW</td>
+      <td class="num">280 MW</td>
+      <td class="num">420.000 €</td>
+    </tr>
+    <tr>
+      <td>Freelancer Vollmachten <span style="color:var(--muted);font-size:11px">(nur Block 1)</span></td>
+      <td class="num">Ø 3.167 €/Projekt</td>
+      <td class="num">18 Projekte</td>
+      <td class="num">57.000 €</td>
+    </tr>
+    <tr>
+      <td>Bauantrag Erstellung (RHO) <span style="color:var(--muted);font-size:11px">(nur Block 1)</span></td>
+      <td class="num">5.100 €/Projekt</td>
+      <td class="num">18 Projekte</td>
+      <td class="num">91.800 €</td>
+    </tr>
+    <tr>
+      <td>Vermessung <span style="color:var(--muted);font-size:11px">(nur Block 1)</span></td>
+      <td class="num">MS 1.466 / HS 4.104 €</td>
+      <td class="num">12 MS + 6 HS</td>
+      <td class="num">42.216 €</td>
+    </tr>
+    <tr>
+      <td>Freelancer Projektarbeit <span style="color:var(--muted);font-size:11px">(nur Block 1)</span></td>
+      <td class="num">455 €/Projekt</td>
+      <td class="num">18 Projekte</td>
+      <td class="num">8.190 €</td>
+    </tr>
+    <tr class="grandtotal">
+      <td>Gesamtkosten</td>
+      <td class="num"></td>
+      <td class="num"></td>
+      <td class="num">1.429.206 €</td>
+    </tr>
+    <tr class="subtotal">
+      <td style="color:var(--red)">davon nicht refundable (VM + BA + Verm + FL)</td>
+      <td class="num"></td>
+      <td class="num"></td>
+      <td class="num" style="color:var(--red)">199.206 €</td>
+    </tr>
+  </table>
+  <div class="kpi-row" style="margin-top:16px">
+    <div class="kpi"><div class="kpi-label">Block 1 (30%)</div><div class="kpi-value" style="color:var(--green)">18</div><div class="kpi-sub">12 MS + 6 HS (540 MW)</div></div>
+    <div class="kpi"><div class="kpi-label">Block 2+3 (100%)</div><div class="kpi-value" style="color:var(--accent)">7</div><div class="kpi-sub">280 MW (nur RGV)</div></div>
+    <div class="kpi"><div class="kpi-label">Refundable (RGV)</div><div class="kpi-value" style="color:var(--accent)">1.230.000</div><div class="kpi-sub">86% der Gesamtkosten</div></div>
+    <div class="kpi"><div class="kpi-label">Nicht refundable</div><div class="kpi-value" style="color:var(--red)">199.206</div><div class="kpi-sub">369 €/MW (B1: 540 MW)</div></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCENARIO 3: 30% mit Block 4                                    -->
+<!-- ============================================================ -->
+
+<div class="scenario scenario-30" style="border-color:rgba(63,185,80,0.5)">
+  <h3 class="green">Szenario 30% (mit Block 4): 18 B1 + 7 B2+3 + 11 B4 realisiert (1.040 MW)</h3>
+  <table>
+    <tr>
+      <th>Kostenposition</th>
+      <th class="num">Stückpreis</th>
+      <th class="num">Menge</th>
+      <th class="num">Summe</th>
+    </tr>
+    <tr class="refund">
+      <td>RGV-Kaution Block 1 <span class="badge-ref">refundable / verrechnet*</span></td>
+      <td class="num">1.500 €/MW</td>
+      <td class="num">540 MW</td>
+      <td class="num">810.000 €</td>
+    </tr>
+    <tr class="refund">
+      <td>RGV-Kaution Block 2+3 <span class="badge-ref">refundable / verrechnet*</span></td>
+      <td class="num">1.500 €/MW</td>
+      <td class="num">280 MW</td>
+      <td class="num">420.000 €</td>
+    </tr>
+    <tr class="refund">
+      <td>RGV-Kaution Block 4 <span class="badge-ref">refundable / verrechnet*</span></td>
+      <td class="num">1.500 €/MW</td>
+      <td class="num">220 MW</td>
+      <td class="num">330.000 €</td>
+    </tr>
+    <tr>
+      <td>Freelancer Vollmachten <span style="color:var(--muted);font-size:11px">(nur Block 1)</span></td>
+      <td class="num">Ø 3.167 €/Projekt</td>
+      <td class="num">18 Projekte</td>
+      <td class="num">57.000 €</td>
+    </tr>
+    <tr>
+      <td>Bauantrag Erstellung (RHO) <span style="color:var(--muted);font-size:11px">(Block 1 + 4)</span></td>
+      <td class="num">5.100 €/Projekt</td>
+      <td class="num">18 + 11 Projekte</td>
+      <td class="num">147.900 €</td>
+    </tr>
+    <tr>
+      <td>Vermessung <span style="color:var(--muted);font-size:11px">(Block 1 + 4)</span></td>
+      <td class="num">MS 1.466 / HS 4.104 €</td>
+      <td class="num">B1: 12+6 · B4: 11 MS</td>
+      <td class="num">58.342 €</td>
+    </tr>
+    <tr>
+      <td>Freelancer Projektarbeit <span style="color:var(--muted);font-size:11px">(nur Block 1)</span></td>
+      <td class="num">455 €/Projekt</td>
+      <td class="num">18 Projekte</td>
+      <td class="num">8.190 €</td>
+    </tr>
+    <tr class="grandtotal">
+      <td>Gesamtkosten</td>
+      <td class="num"></td>
+      <td class="num"></td>
+      <td class="num">1.831.432 €</td>
+    </tr>
+    <tr class="subtotal">
+      <td style="color:var(--red)">davon nicht refundable (VM + BA + Verm + FL)</td>
+      <td class="num"></td>
+      <td class="num"></td>
+      <td class="num" style="color:var(--red)">271.432 €</td>
+    </tr>
+  </table>
+  <div class="kpi-row" style="margin-top:16px">
+    <div class="kpi"><div class="kpi-label">Block 1 (30%)</div><div class="kpi-value" style="color:var(--green)">18</div><div class="kpi-sub">12 MS + 6 HS (540 MW)</div></div>
+    <div class="kpi"><div class="kpi-label">Block 2+3 (100%)</div><div class="kpi-value" style="color:var(--accent)">7</div><div class="kpi-sub">280 MW (nur RGV)</div></div>
+    <div class="kpi"><div class="kpi-label">Block 4 (30%)</div><div class="kpi-value" style="color:var(--green)">11</div><div class="kpi-sub">220 MW (kein FL)</div></div>
+    <div class="kpi"><div class="kpi-label">Refundable (RGV)</div><div class="kpi-value" style="color:var(--accent)">1.560.000</div><div class="kpi-sub">85% der Gesamtkosten</div></div>
+    <div class="kpi"><div class="kpi-label">Nicht refundable</div><div class="kpi-value" style="color:var(--red)">271.432</div><div class="kpi-sub">357 €/MW (B1+4: 760 MW)</div></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- REFUND-ERKLÄRUNG                                              -->
+<!-- ============================================================ -->
+
+<div class="refund-note">
+  <strong>* Realisierungskaution (1.500 €/MW) — Szenarien:</strong><br><br>
+  <table style="width:100%;border-collapse:collapse;background:transparent;border:1px solid rgba(88,166,255,0.2);margin:8px 0 12px 0;">
+    <tr>
+      <th style="background:rgba(88,166,255,0.08);text-align:left;padding:8px 14px;font-size:12px;color:var(--muted);border-bottom:1px solid rgba(88,166,255,0.15)">Szenario</th>
+      <th style="background:rgba(88,166,255,0.08);text-align:left;padding:8px 14px;font-size:12px;color:var(--muted);border-bottom:1px solid rgba(88,166,255,0.15)">Realisierungskaution (1.500 €/MW)</th>
+    </tr>
+    <tr>
+      <td style="padding:8px 14px;font-size:13px;border-bottom:1px solid rgba(88,166,255,0.1)">Keine Zuteilung</td>
+      <td style="padding:8px 14px;font-size:13px;border-bottom:1px solid rgba(88,166,255,0.1);color:var(--green)">Rückerstattung bis 10.05.2027</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 14px;font-size:13px;border-bottom:1px solid rgba(88,166,255,0.1)">Zuteilung, Projekt realisiert</td>
+      <td style="padding:8px 14px;font-size:13px;border-bottom:1px solid rgba(88,166,255,0.1);color:var(--accent)">Anrechnung auf BKZ</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 14px;font-size:13px;border-bottom:1px solid rgba(88,166,255,0.1)">Zuteilung, 8-Wochen-Frist Flächennachweis verpasst</td>
+      <td style="padding:8px 14px;font-size:13px;border-bottom:1px solid rgba(88,166,255,0.1);color:var(--red);font-weight:600">Verfällt — Reservierung weg</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 14px;font-size:13px">Zuteilung, Projektrückzug aus eigenen Gründen</td>
+      <td style="padding:8px 14px;font-size:13px;color:var(--red);font-weight:600">Verfällt</td>
+    </tr>
+  </table>
+  <em style="color:var(--muted)">→ Im 30%-Szenario: 69 abgelehnte Standorte erhalten volle Rückerstattung, 36 realisierte werden auf BKZ angerechnet.</em>
+</div>
+
+<!-- ============================================================ -->
+<!-- DETAILANSICHT TRENNER                                         -->
+<!-- ============================================================ -->
+<div style="margin:60px 0 40px;text-align:center">
+  <div style="display:flex;align-items:center;gap:16px">
+    <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)"></div>
+    <span style="color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:3px;white-space:nowrap">Detailansicht</span>
+    <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)"></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- AUFSCHLÜSSELUNG MS / HS                                       -->
+<!-- ============================================================ -->
+
+<div class="section">
+  <h2>Aufschlüsselung nach Segment</h2>
+  <table>
+    <tr>
+      <th></th>
+      <th class="num" colspan="2" style="text-align:center;border-right:1px solid var(--border)">Mittelspannung (MS)</th>
+      <th class="num" colspan="2" style="text-align:center">Hochspannung (HS)</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th class="num" style="font-size:10px">100% (40 Proj.)</th>
+      <th class="num" style="font-size:10px;border-right:1px solid var(--border)">30% (12 Proj.)</th>
+      <th class="num" style="font-size:10px">100% (20 Proj.)</th>
+      <th class="num" style="font-size:10px">30% (6 Proj.)</th>
+    </tr>
+    <tr class="refund">
+      <td>RGV-Gebühr*</td>
+      <td class="num">1.200.000 €</td>
+      <td class="num" style="border-right:1px solid var(--border)">360.000 €</td>
+      <td class="num">1.500.000 €</td>
+      <td class="num">450.000 €</td>
+    </tr>
+    <tr>
+      <td>Vollmachten</td>
+      <td class="num">126.667 €</td>
+      <td class="num" style="border-right:1px solid var(--border)">38.000 €</td>
+      <td class="num">63.333 €</td>
+      <td class="num">19.000 €</td>
+    </tr>
+    <tr>
+      <td>Bauanträge</td>
+      <td class="num">204.000 €</td>
+      <td class="num" style="border-right:1px solid var(--border)">61.200 €</td>
+      <td class="num">102.000 €</td>
+      <td class="num">30.600 €</td>
+    </tr>
+    <tr>
+      <td>Vermessung</td>
+      <td class="num">58.640 €</td>
+      <td class="num" style="border-right:1px solid var(--border)">17.592 €</td>
+      <td class="num">82.080 €</td>
+      <td class="num">24.624 €</td>
+    </tr>
+    <tr>
+      <td>FL Projektarbeit</td>
+      <td class="num">18.200 €</td>
+      <td class="num" style="border-right:1px solid var(--border)">5.460 €</td>
+      <td class="num">9.100 €</td>
+      <td class="num">2.730 €</td>
+    </tr>
+    <tr class="grandtotal">
+      <td>Summe</td>
+      <td class="num">1.607.507 €</td>
+      <td class="num" style="border-right:1px solid var(--border)">482.252 €</td>
+      <td class="num">1.756.513 €</td>
+      <td class="num">526.954 €</td>
+    </tr>
+    <tr>
+      <td style="color:var(--muted);font-size:12px">€/MW</td>
+      <td class="num" style="color:var(--muted);font-size:12px">2.009</td>
+      <td class="num" style="color:var(--muted);font-size:12px;border-right:1px solid var(--border)">2.009</td>
+      <td class="num" style="color:var(--muted);font-size:12px">1.757</td>
+      <td class="num" style="color:var(--muted);font-size:12px">1.757</td>
+    </tr>
+    <tr>
+      <td style="color:var(--red);font-size:12px">davon nicht refundable</td>
+      <td class="num" style="color:var(--red);font-size:12px">407.507 €</td>
+      <td class="num" style="color:var(--red);font-size:12px;border-right:1px solid var(--border)">122.252 €</td>
+      <td class="num" style="color:var(--red);font-size:12px">256.513 €</td>
+      <td class="num" style="color:var(--red);font-size:12px">76.954 €</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- KOSTEN PRO EINZELPROJEKT                                      -->
+<!-- ============================================================ -->
+
+<div class="section">
+  <h2>Kosten pro Einzelprojekt</h2>
+  <table>
+    <tr>
+      <th></th>
+      <th class="num">MS (20 MW)</th>
+      <th class="num">HS (50 MW)</th>
+    </tr>
+    <tr class="refund">
+      <td>RGV-Teilnahme (verrechnet)*</td>
+      <td class="num">30.000 €</td>
+      <td class="num">75.000 €</td>
+    </tr>
+    <tr>
+      <td>Vollmacht Freelancer</td>
+      <td class="num">3.167 €</td>
+      <td class="num">3.167 €</td>
+    </tr>
+    <tr>
+      <td>Bauantrag Erstellung</td>
+      <td class="num">5.100 €</td>
+      <td class="num">5.100 €</td>
+    </tr>
+    <tr>
+      <td>Vermessung</td>
+      <td class="num">1.466 €</td>
+      <td class="num">4.104 €</td>
+    </tr>
+    <tr>
+      <td>Freelancer Projektarbeit</td>
+      <td class="num">455 €</td>
+      <td class="num">455 €</td>
+    </tr>
+    <tr class="grandtotal">
+      <td>Kosten pro Projekt</td>
+      <td class="num">40.188 €</td>
+      <td class="num">87.826 €</td>
+    </tr>
+    <tr class="subtotal">
+      <td style="color:var(--red)">davon nicht refundable</td>
+      <td class="num" style="color:var(--red)">10.188 €</td>
+      <td class="num" style="color:var(--red)">12.826 €</td>
+    </tr>
+    <tr>
+      <td style="color:var(--muted);font-size:12px">€/MW</td>
+      <td class="num" style="color:var(--muted);font-size:12px">2.009</td>
+      <td class="num" style="color:var(--muted);font-size:12px">1.757</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- FREELANCER DETAIL                                             -->
+<!-- ============================================================ -->
+
+<div class="assumptions">
+  <h3>Freelancer — Aufschlüsselung</h3>
+  <table>
+    <tr>
+      <th style="background:transparent">Freelancer</th>
+      <th class="num" style="background:transparent">Vollmacht</th>
+      <th class="num" style="background:transparent">Stundensatz</th>
+      <th class="num" style="background:transparent">Stunden</th>
+      <th class="num" style="background:transparent">Summe/Projekt</th>
+    </tr>
+    <tr>
+      <td>Phoenix GmbH</td>
+      <td class="num">3.000 €</td>
+      <td class="num">60 €/h</td>
+      <td class="num">130 h</td>
+      <td class="num">3.000 + 130 €</td>
+    </tr>
+    <tr>
+      <td>Velat Bayram</td>
+      <td class="num">3.500 €</td>
+      <td class="num">75 €/h</td>
+      <td class="num">130 h</td>
+      <td class="num">3.500 + 163 €</td>
+    </tr>
+    <tr>
+      <td>Thomas Schindler (DEW)</td>
+      <td class="num">3.000 €</td>
+      <td class="num">75 €/h</td>
+      <td class="num">130 h</td>
+      <td class="num">3.000 + 163 €</td>
+    </tr>
+    <tr class="subtotal">
+      <td><strong>Durchschnitt pro Projekt</strong></td>
+      <td class="num"><strong>Ø 3.167 €</strong></td>
+      <td class="num"><strong>Ø 70 €/h</strong></td>
+      <td class="num"><strong>6,5 h</strong></td>
+      <td class="num"><strong>3.167 + 455 €</strong></td>
+    </tr>
+  </table>
+  <p style="color:var(--muted);font-size:12px;margin-top:8px">390 h Gesamtbudget (3 × 130 h) auf 60 Projekte = 6,5 h/Projekt × Ø 70 €/h = 455 €/Projekt</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- ANNAHMEN                                                      -->
+<!-- ============================================================ -->
+
+<div class="assumptions">
+  <h3>Annahmen</h3>
+  <table>
+    <tr><td style="color:var(--muted);width:250px">Block 1: Neue UWs</td><td><strong>60</strong> (verfügbar + teilweise verfügbar) — Freelancer-Akquise</td></tr>
+    <tr><td style="color:var(--muted)">Block 2+3: Bestehende Projekte</td><td><strong>7</strong> (begrenzt verfügbar, BA/BG vorhanden) — <strong>nur RGV-Kaution</strong>, 280 MW</td></tr>
+    <tr><td style="color:var(--muted)">Block 4: Deal am Standort</td><td><strong>38</strong> (begrenzt verfügbar, Staff-Akquise) — <strong>kein Freelancer</strong>, 760 MW</td></tr>
+    <tr><td style="color:var(--muted)">Block 1: davon MS</td><td><strong>40</strong> Projekte × <strong>20 MW</strong> = 800 MW</td></tr>
+    <tr><td style="color:var(--muted)">Block 1: davon HS</td><td><strong>20</strong> Projekte × <strong>50 MW</strong> = 1.000 MW</td></tr>
+    <tr><td style="color:var(--muted)">Block 4: angenommen MS</td><td><strong>38</strong> Projekte × <strong>20 MW</strong> = 760 MW</td></tr>
+    <tr><td style="color:var(--muted)">RGV-Teilnahmegebühr</td><td><strong>1.500 €/MW</strong> — refundable bei Ablehnung / verrechnet bei Zuschlag*</td></tr>
+    <tr><td style="color:var(--muted)">Freelancer Vollmacht</td><td><strong>Ø 3.167 €/Projekt</strong> (Velat 3.500, Phoenix 3.000, Schindler 3.000) — nicht refundable</td></tr>
+    <tr><td style="color:var(--muted)">Bauantrag Erstellung (Ø)</td><td><strong>5.100 €/Projekt</strong> — nicht refundable</td></tr>
+    <tr><td style="color:var(--muted)">Vermessung (Ø)</td><td><strong>MS 1.466 € / HS 4.104 €</strong> pro Projekt — Durchschnitt aus Kostenübersicht (57 MS, 35 HS Projekte)</td></tr>
+    <tr><td style="color:var(--muted)">Freelancer Projektarbeit</td><td><strong>455 €/Projekt</strong> (Ø 70 €/h × 6,5 h)</td></tr>
+    <tr><td style="color:var(--muted)">Erfüllungsquote</td><td><strong>30%</strong> (gleichmäßig auf MS und HS)</td></tr>
+  </table>
+</div>
+
+<footer>
+  MS/HS Reifegradverfahren Kostenaufstellung · Terra One Climate Solutions GmbH · Alle Beträge netto<br>
+  <span style="color:var(--accent)">*</span> <strong>RGV-Gebühr:</strong> Rückerstattung bei Ablehnung/Rücktritt. Verrechnung mit Netzanschlusskosten bei Zuschlag. In keinem Szenario ein Verlust.<br>
+  Vollmachten, Bauanträge, Vermessung und FL-Stunden fallen nur für realisierte Projekte an (nach RGV-Zuschlag).<br>
+  Vermessungskosten basierend auf Ø-Werten aus der Kostenübersicht: MS Ø 1.466 € (n=57), HS Ø 4.104 € (n=35).
+</footer>
+
+</body>
+</html>
